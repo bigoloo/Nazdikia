@@ -1,11 +1,23 @@
 package com.bigoloo.interview.cafe.nazdikia.models
 
-import android.location.Location
+
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
 sealed class Tracker {
-    object NotAvailable:Tracker()
-    data class Available(val location: Location):Tracker()
+    object NotAvailable : Tracker()
+    data class Available(val location: Location) : Tracker()
 }
 
+@Parcelize
+data class Location(val lat: Double, val lng: Double) : Parcelable {
+    fun isInZone(location: Location, thresholdInMeter: Double): Boolean {
+        val result = FloatArray(2)
+        android.location.Location.distanceBetween(lat, location.lat, lng, location.lng, result)
 
-data class Place(val title: String)
+        return result[0] <= thresholdInMeter
+    }
+}
+
+@Parcelize
+data class Place(val title: String) : Parcelable
