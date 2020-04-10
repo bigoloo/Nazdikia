@@ -1,9 +1,9 @@
-package com.bigoloo.interview.cafe.nazdikia.domain.location
+package com.bigoloo.interview.cafe.nazdikia.domain.datastore
 
 import com.bigoloo.interview.cafe.nazdikia.models.Tracker
 import kotlinx.coroutines.flow.Flow
 
-interface LocationTracker {
-    //TODO add the connectivity awareness
+interface LocationDataStore {
+    fun setTracker(tracker: Tracker)
     fun getTracker(): Flow<Tracker>
 }

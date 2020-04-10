@@ -1,6 +1,6 @@
 package com.bigoloo.interview.cafe.nazdikia.domain.intractors
 
-import com.bigoloo.interview.cafe.nazdikia.domain.location.LocationTracker
+import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationDataStore
 import com.bigoloo.interview.cafe.nazdikia.models.Place
 import com.bigoloo.interview.cafe.nazdikia.models.Tracker
 import kotlinx.coroutines.*
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlin.coroutines.CoroutineContext
 
 class GetNearByPlaceService(
-    private val locationTracker: LocationTracker,
+    private val locationDataStore: LocationDataStore,
     private val getNearByPlaceUseCase: GetNearByPlaceUseCase,
     coroutineDispatcher: CoroutineDispatcher
 ) : CoroutineScope {
@@ -26,7 +26,7 @@ class GetNearByPlaceService(
 
     fun onCreate() {
         launch {
-            locationTracker.getTracker().collect {
+            locationDataStore.getTracker().collect {
                 updateLocation(it)
             }
         }
@@ -48,7 +48,7 @@ class GetNearByPlaceService(
     }
 
     fun onStop() {
-        scope.coroutineContext.cancelChildren()
+        job.cancelChildren()
     }
 
 

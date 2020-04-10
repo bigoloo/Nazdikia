@@ -7,6 +7,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 fun createTestDispatcherProvider(coroutineDispatcher: CoroutineDispatcher): CoroutineDispatcherProvider =
     object : CoroutineDispatcherProvider {
         override fun backgroundDispatcher() = coroutineDispatcher
-        override fun uiDispatcher() = coroutineDispatcher
+        override fun mainDispatcher() = coroutineDispatcher
 
     }

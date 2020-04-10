@@ -21,3 +21,8 @@ data class Location(val lat: Double, val lng: Double) : Parcelable {
 
 @Parcelize
 data class Place(val title: String) : Parcelable
+
+
+fun android.location.Location.toLocation(): Location {
+    return Location(latitude, longitude)
+}

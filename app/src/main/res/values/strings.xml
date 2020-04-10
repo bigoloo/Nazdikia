@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Nazdikia</string>
+    <string name="channel_name">Important</string>
+    <string name="channel_description">This channel shows important information</string>
+    <string name="important_channel_id">3335534</string>
 </resources>
