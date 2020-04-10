@@ -17,7 +17,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.flow.combine
 import kotlin.random.Random
 
 class FusedLocationTrackerService(
@@ -53,7 +53,7 @@ class FusedLocationTrackerService(
         )
         scope.launch {
             internetConnectivityDataStore.isConnected()
-                .zip(locationPermissionStatusDataStore.getGrantedStatus()) { internetStatus, permissionStatus ->
+                .combine(locationPermissionStatusDataStore.getGrantedStatus()) { internetStatus, permissionStatus ->
                     Log.e(
                         "LocationTrackerService",
                         "internet status internetStatus $internetStatus  permissionStatus $permissionStatus"

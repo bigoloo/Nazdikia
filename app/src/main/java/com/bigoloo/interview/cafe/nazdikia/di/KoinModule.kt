@@ -10,6 +10,8 @@ import com.bigoloo.interview.cafe.nazdikia.domain.datastore.InternetConnectivity
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationPermissionStatusDataStore
 import com.bigoloo.interview.cafe.nazdikia.presentation.ApplicationLifecycleObserver
+import com.bigoloo.interview.cafe.nazdikia.presentation.viewmodel.MainActivityViewModel
+import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val koinModule = module {
@@ -32,5 +34,11 @@ val koinModule = module {
         )
     }
     single { ApplicationLifecycleObserver(get(), get(), get(), get()) }
+
+    single { applicationDispatcherProvider }
+
+    viewModel {
+        MainActivityViewModel(get(), get())
+    }
 
 }
