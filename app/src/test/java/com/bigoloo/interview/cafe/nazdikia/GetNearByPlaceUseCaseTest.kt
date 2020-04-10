@@ -1,19 +1,12 @@
 package com.bigoloo.interview.cafe.nazdikia
 
 import com.bigoloo.interview.cafe.nazdikia.base.MainCoroutineRule
-import com.bigoloo.interview.cafe.nazdikia.data.location.CacheDataRepository
 import com.bigoloo.interview.cafe.nazdikia.data.place.LocalPlaceRepository
 import com.bigoloo.interview.cafe.nazdikia.data.place.RemotePlaceRepository
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.GetNearByPlaceUseCase
-import com.bigoloo.interview.cafe.nazdikia.models.Location
 import io.mockk.MockKAnnotations
-import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 
 class GetNearByPlaceUseCaseTest {
 
@@ -24,8 +17,7 @@ class GetNearByPlaceUseCaseTest {
     @RelaxedMockK
     lateinit var remotePlaceRepository: RemotePlaceRepository
 
-    @RelaxedMockK
-    lateinit var dataRepository: CacheDataRepository
+
 
     @get:Rule
     private val mainCoroutineRule = MainCoroutineRule()
@@ -36,14 +28,8 @@ class GetNearByPlaceUseCaseTest {
         MockKAnnotations.init(this)
     }
 
-    private fun createGetNearByPlaceUseCase(): GetNearByPlaceUseCase {
-        return GetNearByPlaceUseCase(
-            localPlaceRepository,
-            remotePlaceRepository,
-            dataRepository
-        )
-    }
 
+/*
     @Test
     fun `test when  location is not changed then local repository should be called`() =
         mainCoroutineRule.runBlockingTest {
@@ -58,10 +44,10 @@ class GetNearByPlaceUseCaseTest {
             getNearByPlaceUseCase.getPlaces(lastLocation)
 
             coVerify(exactly = 1) {
-                localPlaceRepository.getNearByPlaces()
+                localPlaceRepository.getNearByPlaces(paginationInfo, location)
             }
             coVerify(exactly = 0) {
-                remotePlaceRepository.getNearByPlaces()
+                remotePlaceRepository.getNearByPlaces(paginationInfo, location)
             }
         }
 
@@ -78,13 +64,13 @@ class GetNearByPlaceUseCaseTest {
             getNearByPlaceUseCase.getPlaces(lastLocation)
 
             coVerify(exactly = 0) {
-                localPlaceRepository.getNearByPlaces()
+                localPlaceRepository.getNearByPlaces(paginationInfo, location)
             }
             coVerify(exactly = 1) {
-                remotePlaceRepository.getNearByPlaces()
+                remotePlaceRepository.getNearByPlaces(paginationInfo, location)
             }
             coVerify(exactly = 1) {
-                localPlaceRepository.setPlaces(any())
+                localPlaceRepository.savePlaces(any())
             }
         }
 
@@ -101,10 +87,10 @@ class GetNearByPlaceUseCaseTest {
             getNearByPlaceUseCase.getPlaces(lastLocation)
 
             coVerify(exactly = 0) {
-                localPlaceRepository.getNearByPlaces()
+                localPlaceRepository.getNearByPlaces(paginationInfo, location)
             }
             coVerify(exactly = 1) {
-                remotePlaceRepository.getNearByPlaces()
+                remotePlaceRepository.getNearByPlaces(paginationInfo, location)
             }
-        }
+        }*/
 }

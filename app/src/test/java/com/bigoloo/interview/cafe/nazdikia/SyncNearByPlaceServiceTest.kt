@@ -2,20 +2,16 @@ package com.bigoloo.interview.cafe.nazdikia
 
 
 import com.bigoloo.interview.cafe.nazdikia.base.MainCoroutineRule
-import com.bigoloo.interview.cafe.nazdikia.base.createTestDispatcherProvider
 import com.bigoloo.interview.cafe.nazdikia.data.place.LocalPlaceRepository
 import com.bigoloo.interview.cafe.nazdikia.data.place.RemotePlaceRepository
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationDataStore
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.GetNearByPlaceService
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.GetNearByPlaceUseCase
-import com.bigoloo.interview.cafe.nazdikia.domain.repository.DataRepository
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
 import org.junit.Before
 import org.junit.Rule
 
 
-class GetNearByPlaceServiceTest {
+class SyncNearByPlaceServiceTest {
 
     @RelaxedMockK
     lateinit
@@ -24,8 +20,7 @@ class GetNearByPlaceServiceTest {
     @RelaxedMockK
     lateinit var remotePlaceRepository: RemotePlaceRepository
 
-    @RelaxedMockK
-    lateinit var dataRepository: DataRepository
+
 
     @RelaxedMockK
     lateinit var locationDataStore: LocationDataStore
@@ -38,15 +33,6 @@ class GetNearByPlaceServiceTest {
         MockKAnnotations.init(this)
     }
 
-    private fun createGetNearbyPlaceService(): GetNearByPlaceService {
-
-        val getNearByPlaceUseCase =
-            GetNearByPlaceUseCase(localPlaceRepository, remotePlaceRepository, dataRepository)
-        return GetNearByPlaceService(
-            locationDataStore, getNearByPlaceUseCase,
-            createTestDispatcherProvider(mainCoroutineRule.getDispatcher()).backgroundDispatcher()
-        )
-    }
 
 
 }
