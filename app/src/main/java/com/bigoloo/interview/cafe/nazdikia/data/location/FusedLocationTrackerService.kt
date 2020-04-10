@@ -18,7 +18,6 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.zip
-import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 class FusedLocationTrackerService(
@@ -26,13 +25,12 @@ class FusedLocationTrackerService(
     private val locationDataStore: LocationDataStore,
     private val internetConnectivityDataStore: InternetConnectivityDataStore,
     private val locationPermissionStatusDataStore: LocationPermissionStatusDataStore,
-    coroutineDispatcher: CoroutineDispatcher
-) : CoroutineScope {
+    private val coroutineDispatcher: CoroutineDispatcher
+) {
 
-    private val job = SupervisorJob()
-    private val scope = CoroutineScope(coroutineDispatcher + job)
-    override val coroutineContext: CoroutineContext
-        get() = scope.coroutineContext
+
+    private lateinit var scope: CoroutineScope
+
     private val fusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
     private val locationRequest = LocationRequest().let {
@@ -43,23 +41,30 @@ class FusedLocationTrackerService(
     }
 
     fun start() {
+
+        scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
         Log.e(
-            "fuckyou",
-            "FusedLocationTrackerService start"
+            "LocationTrackerService",
+            "LocationTrackerService start"
         )
-        launch {
+        Log.e(
+            "LocationTrackerService",
+            "internetConnectivityDataStore $internetConnectivityDataStore"
+        )
+        scope.launch {
             internetConnectivityDataStore.isConnected()
                 .zip(locationPermissionStatusDataStore.getGrantedStatus()) { internetStatus, permissionStatus ->
                     Log.e(
-                        "fuckyou",
+                        "LocationTrackerService",
                         "internet status internetStatus $internetStatus  permissionStatus $permissionStatus"
                     )
-                    internetStatus// && permissionStatus
-                    true
+                    internetStatus && permissionStatus
+
                 }.collect {
-                    Log.e("fuckyou", "FusedLocationTrackerService $it")
+                    Log.e("LocationTrackerService", "Connectivity $it")
                     if (it) {
-                        startTrackingLocation()
+                        locationTrackerJob?.cancel()
+                        locationTrackerJob = startTrackingLocation()
                     } else
                         stopTrackingLocation()
                 }
@@ -71,10 +76,10 @@ class FusedLocationTrackerService(
         locationTrackerJob?.cancel()
     }
 
-    private suspend fun startTrackingLocation() {
-        locationTrackerJob?.cancel()
-        locationTrackerJob = suspendCancellableCoroutine { continuation ->
-            Log.e("fuckyou", "FusedLocationTrackerService start")
+    private suspend fun startTrackingLocation() = scope.launch {
+
+        suspendCancellableCoroutine { continuation ->
+            Log.e("LocationTrackerService", "suspendCancellableCoroutine start")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.checkSelfPermission(
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
@@ -82,14 +87,15 @@ class FusedLocationTrackerService(
                 locationDataStore.setTracker(Tracker.NotAvailable)
 
             }
-            val handlerThread = HandlerThread("Location Handler Thread ${Random.nextInt()}").apply {
-                start()
-            }
+            val handlerThread =
+                HandlerThread("Location Handler Thread ${Random.nextInt()}").apply {
+                    start()
+                }
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult?) {
                     super.onLocationResult(result)
                     result?.locations?.forEach {
-                        Log.e("fuckyou", "FusedLocationTrackerService locations $it")
+                        Log.e("LocationTrackerService", " locations $it")
                         locationDataStore.setTracker(Tracker.Available(it.toLocation()))
                     }
 
@@ -100,15 +106,16 @@ class FusedLocationTrackerService(
 
 
             continuation.invokeOnCancellation {
-                Log.e("fuckyou", "FusedLocationTrackerService stop")
+                Log.e("LocationTrackerService", "suspendCancellableCoroutine stop")
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             }
         }
+
     }
 
     fun stop() {
-        Log.e("fuckyou", "FusedLocationTrackerService service stop")
-        job.cancel()
+        Log.e("LocationTrackerService", "FusedLocationTrackerService service stop")
+        scope.cancel()
     }
 
 }

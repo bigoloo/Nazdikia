@@ -5,7 +5,6 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
-
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -24,15 +23,18 @@ class ApplicationLifecycleObserver(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
+
         locationTrackerService.start()
         checkConnectivityStatus()
         registerConnectivityBroadcast()
+
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         locationTrackerService.stop()
         unregisterConnectivityBroadCast()
+
     }
 
     private fun checkConnectivityStatus() {
