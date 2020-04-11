@@ -1,12 +1,11 @@
-package com.bigoloo.interview.cafe.nazdikia.data.place
+package com.bigoloo.interview.cafe.nazdikia.data.repository
 
 import com.bigoloo.interview.cafe.nazdikia.models.Location
 import com.bigoloo.interview.cafe.nazdikia.models.PaginationInfo
 import com.bigoloo.interview.cafe.nazdikia.models.Place
 
-class RemotePlaceRepository :
-    PlaceRepository {
-    override fun getNearByPlaces(
+class RemotePlaceRepository {
+    fun getNearByPlaces(
         paginationInfo: PaginationInfo,
         location: Location
     ): List<Place> {

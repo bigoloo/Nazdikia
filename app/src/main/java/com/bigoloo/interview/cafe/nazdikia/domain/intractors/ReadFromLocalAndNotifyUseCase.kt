@@ -1,6 +1,6 @@
 package com.bigoloo.interview.cafe.nazdikia.domain.intractors
 
-import com.bigoloo.interview.cafe.nazdikia.data.place.LocalPlaceRepository
+import com.bigoloo.interview.cafe.nazdikia.data.repository.LocalPlaceRepository
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.VenueDataStore
 import com.bigoloo.interview.cafe.nazdikia.models.Paginated
 import com.bigoloo.interview.cafe.nazdikia.models.PaginationInfo

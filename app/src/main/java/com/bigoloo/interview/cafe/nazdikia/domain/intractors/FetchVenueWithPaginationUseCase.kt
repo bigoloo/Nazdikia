@@ -1,13 +1,13 @@
 package com.bigoloo.interview.cafe.nazdikia.domain.intractors
 
-import com.bigoloo.interview.cafe.nazdikia.data.place.LocalPlaceRepository
+import com.bigoloo.interview.cafe.nazdikia.data.repository.LocalPlaceRepository
 import com.bigoloo.interview.cafe.nazdikia.models.Location
 import com.bigoloo.interview.cafe.nazdikia.models.PaginationInfo
 
-class FetchVenueWithPagination(
+class FetchVenueWithPaginationUseCase(
     private val localPlaceRepository: LocalPlaceRepository,
     private val readFromLocalAndNotifyUseCase: ReadFromLocalAndNotifyUseCase,
-    private val callRemoteVenueUseCase: CallRemoteVenueUseCase
+    private val callRemoteVenueAndNotifyUseCase: CallRemoteVenueAndNotifyUseCase
 ) {
 
     suspend fun execute(paginationInfo: PaginationInfo, location: Location) {
@@ -18,12 +18,17 @@ class FetchVenueWithPagination(
                     paginationInfo
                 )
             } else {
-                callRemoteVenueUseCase.execute(paginationInfo, location)
+                callRemoteVenueAndNotifyUseCase.execute(paginationInfo, location)
             }
         } else {
-            readFromLocalAndNotifyUseCase.execute(
-                paginationInfo
-            )
+            if (paginationInfo.totalSize == 0 && savedCount == 0) {
+                callRemoteVenueAndNotifyUseCase.execute(
+                    paginationInfo, location
+                )
+            } else
+                readFromLocalAndNotifyUseCase.execute(
+                    paginationInfo
+                )
         }
     }
 }

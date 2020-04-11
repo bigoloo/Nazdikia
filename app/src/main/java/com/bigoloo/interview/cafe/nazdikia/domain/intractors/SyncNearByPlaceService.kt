@@ -12,7 +12,7 @@ class SyncNearByPlaceService(
     private val locationDataStore: LocationDataStore,
     private val venueDataStore: VenueDataStore,
     private val getNearbyVenueUseCase: GetNearbyVenueUseCase,
-    private val loadVenueWithPagination: LocalVenueWithPagination,
+    private val readFromLocalAndNotifyUseCase: ReadFromLocalAndNotifyUseCase,
     coroutineDispatcher: CoroutineDispatcher
 ) : CoroutineScope {
 
@@ -48,7 +48,7 @@ class SyncNearByPlaceService(
     private suspend fun handleRequestedInfo(paginationInfo: PaginationInfo) {
         when (currentTracker) {
             is Tracker.Available -> {
-                getNearbyVenueUseCase.getPlaceByPaginationInfo(
+                getNearbyVenueUseCase.fetchVenues(
                     tracker = currentTracker as Tracker.Available,
                     paginationInfo = paginationInfo
 
@@ -56,7 +56,7 @@ class SyncNearByPlaceService(
 
             }
             null, Tracker.NotAvailable -> {
-                loadVenueWithPagination.execute(paginationInfo)
+                readFromLocalAndNotifyUseCase.execute(paginationInfo)
             }
 
         }
@@ -67,7 +67,7 @@ class SyncNearByPlaceService(
         currentTracker = tracker
         when (tracker) {
             is Tracker.Available -> {
-                getNearbyVenueUseCase.getPlaceByPaginationInfo(
+                getNearbyVenueUseCase.fetchVenues(
                     tracker = currentTracker as Tracker.Available,
                     paginationInfo = null
 

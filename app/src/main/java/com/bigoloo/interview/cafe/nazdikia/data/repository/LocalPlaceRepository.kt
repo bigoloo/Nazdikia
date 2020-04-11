@@ -1,4 +1,4 @@
-package com.bigoloo.interview.cafe.nazdikia.data.place
+package com.bigoloo.interview.cafe.nazdikia.data.repository
 
 import com.bigoloo.interview.cafe.nazdikia.models.PaginationInfo
 import com.bigoloo.interview.cafe.nazdikia.models.Place

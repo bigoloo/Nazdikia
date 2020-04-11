@@ -6,14 +6,15 @@ import com.bigoloo.interview.cafe.nazdikia.data.datastore.CoroutineInternetConne
 import com.bigoloo.interview.cafe.nazdikia.data.datastore.CoroutineLocationDataStore
 import com.bigoloo.interview.cafe.nazdikia.data.datastore.CoroutineVenueDataStore
 import com.bigoloo.interview.cafe.nazdikia.data.datastore.LocationPermissionStatusDataStoreImp
-import com.bigoloo.interview.cafe.nazdikia.data.location.DataRepository
 import com.bigoloo.interview.cafe.nazdikia.data.location.FusedLocationTrackerService
+import com.bigoloo.interview.cafe.nazdikia.data.repository.LocalSharedRepository
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.InternetConnectivityDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationPermissionStatusDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.VenueDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.intractors.CallRemoteAndSyncWithLocalUseCase
 import com.bigoloo.interview.cafe.nazdikia.domain.intractors.ReadFromLocalAndNotifyUseCase
+import com.bigoloo.interview.cafe.nazdikia.domain.repository.SharedRepository
 import com.bigoloo.interview.cafe.nazdikia.presentation.ApplicationLifecycleObserver
 import com.bigoloo.interview.cafe.nazdikia.presentation.viewmodel.MainActivityViewModel
 import com.bigoloo.interview.cafe.nazdikia.presentation.viewmodel.VenueViewModel
@@ -40,11 +41,11 @@ val koinModule = module {
         )
     }
     single { ApplicationLifecycleObserver(get(), get(), get(), get()) }
-    single { DataRepository() }
+    single<SharedRepository> { LocalSharedRepository() }
     single { applicationDispatcherProvider }
     single<VenueDataStore> { CoroutineVenueDataStore() }
     factory { ReadFromLocalAndNotifyUseCase(get(), get()) }
-    factory { CallRemoteAndSyncWithLocalUseCase(get(), get()) }
+    factory { CallRemoteAndSyncWithLocalUseCase(get(), get(), get()) }
     viewModel {
         MainActivityViewModel(get(), get())
     }
