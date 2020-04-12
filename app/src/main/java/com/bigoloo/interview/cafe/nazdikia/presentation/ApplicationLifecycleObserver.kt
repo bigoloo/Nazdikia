@@ -12,27 +12,31 @@ import com.bigoloo.interview.cafe.nazdikia.base.isNetworkConnected
 import com.bigoloo.interview.cafe.nazdikia.data.connectivity.ConnectivityBroadCastReceiver
 import com.bigoloo.interview.cafe.nazdikia.data.location.FusedLocationTrackerService
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.InternetConnectivityDataStore
+import com.bigoloo.interview.cafe.nazdikia.domain.intractors.SyncNearybyVenue
 
 class ApplicationLifecycleObserver(
     private val context: Context,
     private val connectivityBroadCastReceiver: ConnectivityBroadCastReceiver,
     private val internetConnectivityDataStore: InternetConnectivityDataStore,
-    private val locationTrackerService: FusedLocationTrackerService
+    private val locationTrackerService: FusedLocationTrackerService,
+    private val syncNearybyVenue: SyncNearybyVenue
 ) : LifecycleObserver {
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
-
+        syncNearybyVenue.start()
         locationTrackerService.start()
         checkConnectivityStatus()
         registerConnectivityBroadcast()
+
 
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         locationTrackerService.stop()
+        syncNearybyVenue.stop()
         unregisterConnectivityBroadCast()
 
     }

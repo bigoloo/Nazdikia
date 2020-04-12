@@ -7,5 +7,7 @@ interface SharedRepository {
     fun setLastLocation(location: Location)
     fun setLastDataReceivedTimestamp(timestamp: Long)
     fun getLastDataReceivedTimestamp(): Long
+    fun setTotalPage(totalSize: Int)
+    fun getTotalPage(): Int
 
 }

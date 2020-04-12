@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_nav_graph"
+    app:startDestination="@id/homeScreen">
+
+    <fragment
+        android:id="@+id/homeScreen"
+        android:name="com.bigoloo.interview.cafe.nazdikia.presentation.ui.VenueScreen"
+        android:label="home_screen"
+        tools:layout="@layout/home_screen">
+        <action
+            android:id="@+id/action_homeScreen_to_detailScreen"
+            app:destination="@id/detailScreen" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailScreen"
+        android:name="com.bigoloo.interview.cafe.nazdikia.presentation.ui.DetailScreen"
+        android:label="detail_screen"
+        tools:layout="@layout/detail_screen" />
+</navigation>

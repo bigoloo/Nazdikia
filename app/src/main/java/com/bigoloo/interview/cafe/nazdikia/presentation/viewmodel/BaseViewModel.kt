@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import com.bigoloo.interview.cafe.nazdikia.base.coroutine.CoroutineDispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
-abstract class BaseViewModel(coroutineDispatcherProvider: CoroutineDispatcherProvider) :
+abstract class BaseViewModel(private val coroutineDispatcherProvider: CoroutineDispatcherProvider) :
     ViewModel(),
     CoroutineScope {
 
@@ -19,6 +21,22 @@ abstract class BaseViewModel(coroutineDispatcherProvider: CoroutineDispatcherPro
     override fun onCleared() {
         super.onCleared()
         job.cancel()
+    }
+
+    fun onBackground(block: suspend () -> Unit) {
+        launch {
+            withContext(coroutineDispatcherProvider.backgroundDispatcher()) {
+                block()
+            }
+        }
+    }
+
+    fun onUI(block: suspend () -> Unit) {
+        launch {
+            withContext(coroutineDispatcherProvider.mainDispatcher()) {
+                block()
+            }
+        }
     }
 
 }

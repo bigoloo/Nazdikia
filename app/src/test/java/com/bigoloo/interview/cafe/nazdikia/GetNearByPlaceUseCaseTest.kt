@@ -1,12 +1,11 @@
 package com.bigoloo.interview.cafe.nazdikia
 
 import com.bigoloo.interview.cafe.nazdikia.base.MainCoroutineRule
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.CallRemoteVenueAndNotifyUseCase
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.FetchVenueWithPaginationUseCase
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.GetNearbyVenueUseCase
+import com.bigoloo.interview.cafe.nazdikia.domain.intractors.FetchVenuesIfNeededUseCase
+import com.bigoloo.interview.cafe.nazdikia.domain.intractors.ReadLocalFirstOrCallRemoteUseCase
 import com.bigoloo.interview.cafe.nazdikia.domain.repository.SharedRepository
 import com.bigoloo.interview.cafe.nazdikia.models.Location
-import com.bigoloo.interview.cafe.nazdikia.models.PaginationInfo
+import com.bigoloo.interview.cafe.nazdikia.models.PageInfo
 import com.bigoloo.interview.cafe.nazdikia.models.Tracker
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -17,7 +16,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class GetNearbyVenueUseCaseTest {
+class FetchVenuesIfNeededUseCaseTest {
 
 
     @get:Rule
@@ -27,7 +26,7 @@ class GetNearbyVenueUseCaseTest {
     private lateinit var callRemoteVenueAndNotifyUseCase: CallRemoteVenueAndNotifyUseCase
 
     @RelaxedMockK
-    private lateinit var fetchVenueWithPagination: FetchVenueWithPaginationUseCase
+    private lateinit var readLocalFirstOrCallRemote: ReadLocalFirstOrCallRemoteUseCase
 
     @RelaxedMockK
     private lateinit var sharedRepository: SharedRepository
@@ -37,9 +36,9 @@ class GetNearbyVenueUseCaseTest {
         MockKAnnotations.init(this)
     }
 
-    private fun createGetNearbyVenueUseCase(): GetNearbyVenueUseCase {
-        return GetNearbyVenueUseCase(
-            fetchVenueWithPagination,
+    private fun createGetNearbyVenueUseCase(): FetchVenuesIfNeededUseCase {
+        return FetchVenuesIfNeededUseCase(
+            readLocalFirstOrCallRemote,
             callRemoteVenueAndNotifyUseCase,
             sharedRepository
         )
@@ -53,10 +52,10 @@ class GetNearbyVenueUseCaseTest {
 
             val getNearbyVenue = createGetNearbyVenueUseCase()
 
-            getNearbyVenue.fetchVenues(Tracker.Available(Location(32.4, 56.5)), null)
+            getNearbyVenue.fetchVenues(Tracker.Available(Location(lat = 32.4, lng = 56.5)), null)
 
             coVerify(exactly = 0) {
-                fetchVenueWithPagination.execute(any(), any())
+                readLocalFirstOrCallRemote.execute(any(), any())
             }
             coVerify(exactly = 1) {
                 callRemoteVenueAndNotifyUseCase.execute(any(), any())
@@ -75,7 +74,7 @@ class GetNearbyVenueUseCaseTest {
             val getNearbyVenue = createGetNearbyVenueUseCase()
             getNearbyVenue.fetchVenues(Tracker.Available(location), null)
             coVerify(exactly = 0) {
-                fetchVenueWithPagination.execute(any(), any())
+                readLocalFirstOrCallRemote.execute(any(), any())
             }
             coVerify(exactly = 1) {
                 callRemoteVenueAndNotifyUseCase.execute(any(), any())
@@ -90,10 +89,10 @@ class GetNearbyVenueUseCaseTest {
             every { sharedRepository.getLastDataReceivedTimestamp() } returns System.currentTimeMillis()
             every { location.isInZone(any(), any()) } returns false
             val getNearbyVenue = createGetNearbyVenueUseCase()
-            getNearbyVenue.fetchVenues(Tracker.Available(location), PaginationInfo(0, 4, 3))
+            getNearbyVenue.fetchVenues(Tracker.Available(location), PageInfo(0, 4, 3))
 
             coVerify(exactly = 1) {
-                fetchVenueWithPagination.execute(any(), any())
+                readLocalFirstOrCallRemote.execute(any(), any())
             }
             coVerify(exactly = 0) {
                 callRemoteVenueAndNotifyUseCase.execute(any(), any())
@@ -112,7 +111,7 @@ class GetNearbyVenueUseCaseTest {
             getNearbyVenue.fetchVenues(Tracker.Available(location), null)
 
             coVerify(exactly = 0) {
-                fetchVenueWithPagination.execute(any(), any())
+                readLocalFirstOrCallRemote.execute(any(), any())
             }
             coVerify(exactly = 0) {
                 callRemoteVenueAndNotifyUseCase.execute(any(), any())

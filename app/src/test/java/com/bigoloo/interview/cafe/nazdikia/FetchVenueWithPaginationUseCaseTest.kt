@@ -2,11 +2,9 @@ package com.bigoloo.interview.cafe.nazdikia
 
 import com.bigoloo.interview.cafe.nazdikia.base.MainCoroutineRule
 import com.bigoloo.interview.cafe.nazdikia.data.repository.LocalPlaceRepository
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.CallRemoteVenueAndNotifyUseCase
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.FetchVenueWithPaginationUseCase
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.ReadFromLocalAndNotifyUseCase
+import com.bigoloo.interview.cafe.nazdikia.domain.intractors.ReadLocalFirstOrCallRemoteUseCase
 import com.bigoloo.interview.cafe.nazdikia.models.Location
-import com.bigoloo.interview.cafe.nazdikia.models.PaginationInfo
+import com.bigoloo.interview.cafe.nazdikia.models.PageInfo
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
@@ -35,8 +33,8 @@ class FetchVenueWithPaginationUseCaseTest {
         MockKAnnotations.init(this)
     }
 
-    private fun createFetchVenueWithPaginationUseCase(): FetchVenueWithPaginationUseCase {
-        return FetchVenueWithPaginationUseCase(
+    private fun createFetchVenueWithPaginationUseCase(): ReadLocalFirstOrCallRemoteUseCase {
+        return ReadLocalFirstOrCallRemoteUseCase(
             localPlaceRepository,
             readFromLocalAndNotifyUseCase,
             callRemoteVenueAndNotifyUseCase
@@ -46,7 +44,7 @@ class FetchVenueWithPaginationUseCaseTest {
     @Test
     fun `when total data is 0 and saved data is 0 then remote database is called`() =
         mainCoroutineRule.runBlockingTest {
-            val paginationInfo = PaginationInfo(0, 0, 0)
+            val paginationInfo = PageInfo(0, 0, 0)
             val mockLocation = Location(2.2, 42.3)
             every { localPlaceRepository.getSavedVenueCount() } returns 0
 
@@ -65,7 +63,7 @@ class FetchVenueWithPaginationUseCaseTest {
     @Test
     fun `when total data is the same as saved data  and not zero then local database should be called `() =
         mainCoroutineRule.runBlockingTest {
-            val paginationInfo = PaginationInfo(0, 0, 100)
+            val paginationInfo = PageInfo(0, 0, 100)
             val mockLocation = Location(2.2, 42.3)
             every { localPlaceRepository.getSavedVenueCount() } returns 100
 
@@ -85,7 +83,7 @@ class FetchVenueWithPaginationUseCaseTest {
     @Test
     fun `when total data is bigger than saved data and offset +limit is less  than saved data then local database  should be called`() =
         mainCoroutineRule.runBlockingTest {
-            val paginationInfo = PaginationInfo(0, 29, 12)
+            val paginationInfo = PageInfo(0, 29, 12)
             val mockLocation = Location(2.2, 42.3)
             every { localPlaceRepository.getSavedVenueCount() } returns 30
 
@@ -104,7 +102,7 @@ class FetchVenueWithPaginationUseCaseTest {
     @Test
     fun `when total data is bigger than saved data and offset +limit is equal than saved data then local database  should be called`() =
         mainCoroutineRule.runBlockingTest {
-            val paginationInfo = PaginationInfo(0, 30, 12)
+            val paginationInfo = PageInfo(0, 30, 12)
             val mockLocation = Location(2.2, 42.3)
             every { localPlaceRepository.getSavedVenueCount() } returns 30
 
@@ -124,7 +122,7 @@ class FetchVenueWithPaginationUseCaseTest {
     @Test
     fun `when total data is bigger than saved data and offset+limit is bigger than saved data then remote api should be called`() =
         mainCoroutineRule.runBlockingTest {
-            val paginationInfo = PaginationInfo(31, 30, 12)
+            val paginationInfo = PageInfo(31, 30, 12)
             val mockLocation = Location(2.2, 42.3)
             every { localPlaceRepository.getSavedVenueCount() } returns 30
 

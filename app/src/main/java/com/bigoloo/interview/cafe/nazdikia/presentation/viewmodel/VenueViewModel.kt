@@ -1,34 +1,105 @@
 package com.bigoloo.interview.cafe.nazdikia.presentation.viewmodel
 
 import com.bigoloo.interview.cafe.nazdikia.base.coroutine.CoroutineDispatcherProvider
-import com.bigoloo.interview.cafe.nazdikia.domain.datastore.VenueDataStore
+import com.bigoloo.interview.cafe.nazdikia.domain.datastore.DataValidityDataStore
+import com.bigoloo.interview.cafe.nazdikia.domain.intractors.ReadLocalFirstOrCallRemoteUseCase
+import com.bigoloo.interview.cafe.nazdikia.models.PageInfo
+import com.bigoloo.interview.cafe.nazdikia.models.Venue
+import com.bigoloo.interview.cafe.nazdikia.presentation.base.SingleLiveEvent
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
 class VenueViewModel(
-    private val venueDataStore: VenueDataStore,
+    private val dataValidityDataStore: DataValidityDataStore,
+    private val readLocalFirstOrCallRemote: ReadLocalFirstOrCallRemoteUseCase,
     coroutineDispatcherProvider: CoroutineDispatcherProvider
 ) :
     BaseViewModel(coroutineDispatcherProvider) {
 
-
-    //TODO move them to state
-    private val pageLimit = 50
-    private var currentOffset = 0
-    private var total = 0
-
-    fun requestedOffset(offset: Int) {
-        venueDataStore.setRequestedOffset(offset, pageLimit, total)
-    }
-
+    data class ViewState(
+        val pageInfo: PageInfo,
+        val venueList: List<Venue>,
+        val error: Throwable?,
+        val isLoadMoreNeeded: Boolean
+    )
 
     init {
-
         launch {
-            venueDataStore.getVenues().collect {
-
+            onBackground {
+                dataValidityDataStore.getIsValidData().collect {
+                    loadMore()
+                }
             }
         }
     }
+
+    val currentState = SingleLiveEvent<ViewState>().apply {
+        value = ViewState(
+            PageInfo(0, 20, 0), emptyList(), null
+            , isLoadMoreNeeded = false
+        )
+    }
+
+
+    private fun fetchVenues() = launch {
+        //TODO go to loading state
+        onBackground {
+            runCatching {
+                readLocalFirstOrCallRemote.execute(currentState.value!!.pageInfo)
+            }.fold({
+                currentState.value?.let { lastState ->
+                    val newVenueList: List<Venue> =
+                        lastState.venueList.toMutableList() + it.data
+
+                    val newState = ViewState(
+                        pageInfo = PageInfo(
+                            lastState.pageInfo.offset
+                                    + it.data.size,
+                            lastState.pageInfo.limit,
+                            it.pageInfo.totalSize
+                        ),
+                        venueList = newVenueList,
+                        error = null,
+                        isLoadMoreNeeded = newVenueList.size !=
+                                it.pageInfo.totalSize
+
+                    )
+                    onUI {
+                        currentState.value = newState
+                    }
+                }
+            }, {
+                currentState.value?.let { lastState ->
+                    val newState = ViewState(
+                        pageInfo = lastState.pageInfo,
+                        venueList = lastState.venueList,
+                        error = it,
+                        isLoadMoreNeeded = lastState.isLoadMoreNeeded
+
+
+                    )
+                    onUI {
+                        currentState.value = newState
+                    }
+                }
+            })
+        }
+
+    }
+
+    //TODO Refactor
+    private var fetchVenueJob: Job? = null
+    fun loadMore() {
+        fetchVenueJob?.let {
+            if (it.isCompleted || it.isCancelled) {
+                fetchVenueJob = fetchVenues()
+            }
+        } ?: run {
+            fetchVenueJob = fetchVenues()
+        }
+
+    }
+
 }
