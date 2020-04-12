@@ -12,6 +12,7 @@ import com.bigoloo.interview.cafe.nazdikia.models.Venue
 class VenueAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val itemDataType = 0
     private val loadingItemType = 1
+    private val retryItem = 2
 
     private var venueList = emptyList<ListViewItem>()
 

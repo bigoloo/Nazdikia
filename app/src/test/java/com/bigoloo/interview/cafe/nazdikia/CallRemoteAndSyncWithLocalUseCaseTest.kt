@@ -7,8 +7,11 @@ import com.bigoloo.interview.cafe.nazdikia.domain.intractors.CallRemoteAndSyncWi
 import com.bigoloo.interview.cafe.nazdikia.domain.repository.SharedRepository
 import com.bigoloo.interview.cafe.nazdikia.models.Location
 import com.bigoloo.interview.cafe.nazdikia.models.PageInfo
+import com.bigoloo.interview.cafe.nazdikia.models.PageResult
+import com.bigoloo.interview.cafe.nazdikia.models.Venue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
 import org.junit.Before
@@ -47,11 +50,12 @@ class CallRemoteAndSyncWithLocalUseCaseTest {
 
     private val mockPagination = PageInfo(0, 0, 0)
     private val mockLocation = Location(lat = 32.3, lng = 3.4)
+    private val mockPageResult = PageResult(mockPagination, emptyList<Venue>())
 
     @Test
     fun `test when api is called then timestamp should be changed`() =
         mainCoroutineRule.runBlockingTest {
-            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns emptyList()
+            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns mockPageResult
 
             val callRemoteAndSyncWithLocalUseCase = createCallRemoteAndSyncWithLocalUseCase()
             callRemoteAndSyncWithLocalUseCase.execute(mockPagination, mockLocation, false)
@@ -63,11 +67,11 @@ class CallRemoteAndSyncWithLocalUseCaseTest {
     @Test
     fun `test when api is called and erase local database is needed then local repository clear should be called`() =
         mainCoroutineRule.runBlockingTest {
-            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns emptyList()
+            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns mockPageResult
 
             val callRemoteAndSyncWithLocalUseCase = createCallRemoteAndSyncWithLocalUseCase()
             callRemoteAndSyncWithLocalUseCase.execute(mockPagination, mockLocation, true)
-            verify(exactly = 1) {
+            coVerify(exactly = 1) {
                 localPlaceRepository.clearVenues()
             }
         }
@@ -75,11 +79,11 @@ class CallRemoteAndSyncWithLocalUseCaseTest {
     @Test
     fun `test when api is called and  erase local database doesn't  needed  then local clear shouldn't be called`() =
         mainCoroutineRule.runBlockingTest {
-            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns emptyList()
+            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns mockPageResult
 
             val callRemoteAndSyncWithLocalUseCase = createCallRemoteAndSyncWithLocalUseCase()
             callRemoteAndSyncWithLocalUseCase.execute(mockPagination, mockLocation, false)
-            verify(exactly = 0) {
+            coVerify(exactly = 0) {
                 localPlaceRepository.clearVenues()
             }
         }
@@ -87,7 +91,7 @@ class CallRemoteAndSyncWithLocalUseCaseTest {
     @Test
     fun `test when api is called then data should be saved in database`() =
         mainCoroutineRule.runBlockingTest {
-            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns emptyList()
+            coEvery { remotePlaceRepository.getNearbyVenues(any(), any()) } returns mockPageResult
 
             val callRemoteAndSyncWithLocalUseCase = createCallRemoteAndSyncWithLocalUseCase()
 
@@ -96,16 +100,9 @@ class CallRemoteAndSyncWithLocalUseCaseTest {
                 mockLocation,
                 Random.nextBoolean()
             )
-            verify(exactly = 1) {
+            coVerify(exactly = 1) {
                 localPlaceRepository.saveVenues(any())
             }
         }
-
-
-    @Test
-    fun `test when api is called and received data is empty then local data base should be erased or not `() {
-        //TODO product decide about that
-    }
-
 
 }

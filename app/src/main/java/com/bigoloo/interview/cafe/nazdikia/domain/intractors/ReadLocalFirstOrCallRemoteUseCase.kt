@@ -9,7 +9,6 @@ import com.bigoloo.interview.cafe.nazdikia.models.Venue
 
 class ReadLocalFirstOrCallRemoteUseCase(
     private val localPlaceRepository: LocalPlaceRepository,
-    private val localRepository: LocalPlaceRepository,
     private val callRemote: CallRemoteAndSyncWithLocalUseCase,
     private val sharedRepository: SharedRepository
 ) {
@@ -31,7 +30,7 @@ class ReadLocalFirstOrCallRemoteUseCase(
                 callRemote.execute(pageInfo, it, false)
             } ?: throw UnAvailableLocationException
         } else {
-            localRepository.getNearbyVenues(
+            localPlaceRepository.getNearbyVenues(
                 pageInfo
             )
         }

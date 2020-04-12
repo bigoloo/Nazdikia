@@ -19,7 +19,10 @@ class LocalPlaceRepository(
     fun getNearbyVenues(
         pageInfo: PageInfo
     ): PageResult<Venue> {
-        Log.e("getNearbyVenues", "offset ${pageInfo.offset},limit ${pageInfo.limit}")
+        Log.e(
+            "getNearbyVenues",
+            "offset ${pageInfo.offset},limit ${pageInfo.limit} totalsize: ${sharedRepository.getTotalPage()}"
+        )
         val savedVenueList = dao.getVenue(pageInfo.offset, pageInfo.limit)
         return PageResult(
             pageInfo.copy(totalSize = sharedRepository.getTotalPage()),

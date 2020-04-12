@@ -1,11 +1,11 @@
 package com.bigoloo.interview.cafe.nazdikia
 
 import com.bigoloo.interview.cafe.nazdikia.base.MainCoroutineRule
+import com.bigoloo.interview.cafe.nazdikia.domain.datastore.DataValidityDataStore
+import com.bigoloo.interview.cafe.nazdikia.domain.intractors.CallRemoteAndSyncWithLocalUseCase
 import com.bigoloo.interview.cafe.nazdikia.domain.intractors.FetchVenuesIfNeededUseCase
-import com.bigoloo.interview.cafe.nazdikia.domain.intractors.ReadLocalFirstOrCallRemoteUseCase
 import com.bigoloo.interview.cafe.nazdikia.domain.repository.SharedRepository
 import com.bigoloo.interview.cafe.nazdikia.models.Location
-import com.bigoloo.interview.cafe.nazdikia.models.PageInfo
 import com.bigoloo.interview.cafe.nazdikia.models.Tracker
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -22,14 +22,16 @@ class FetchVenuesIfNeededUseCaseTest {
     @get:Rule
     private val mainCoroutineRule = MainCoroutineRule()
 
-    @RelaxedMockK
-    private lateinit var callRemoteVenueAndNotifyUseCase: CallRemoteVenueAndNotifyUseCase
 
     @RelaxedMockK
-    private lateinit var readLocalFirstOrCallRemote: ReadLocalFirstOrCallRemoteUseCase
+    private lateinit var callRemote: CallRemoteAndSyncWithLocalUseCase
+
+    @RelaxedMockK
+    private lateinit var dataValidityDataStore: DataValidityDataStore
 
     @RelaxedMockK
     private lateinit var sharedRepository: SharedRepository
+
 
     @Before
     fun start() {
@@ -38,8 +40,8 @@ class FetchVenuesIfNeededUseCaseTest {
 
     private fun createGetNearbyVenueUseCase(): FetchVenuesIfNeededUseCase {
         return FetchVenuesIfNeededUseCase(
-            readLocalFirstOrCallRemote,
-            callRemoteVenueAndNotifyUseCase,
+            callRemote,
+            dataValidityDataStore,
             sharedRepository
         )
     }
@@ -52,15 +54,12 @@ class FetchVenuesIfNeededUseCaseTest {
 
             val getNearbyVenue = createGetNearbyVenueUseCase()
 
-            getNearbyVenue.fetchVenues(Tracker.Available(Location(lat = 32.4, lng = 56.5)), null)
+            getNearbyVenue.fetchVenues(Tracker.Available(Location(lat = 32.4, lng = 56.5)))
 
-            coVerify(exactly = 0) {
-                readLocalFirstOrCallRemote.execute(any(), any())
-            }
             coVerify(exactly = 1) {
-                callRemoteVenueAndNotifyUseCase.execute(any(), any())
+                callRemote.execute(any(), any(), true)
+                dataValidityDataStore.setIsValidData(false)
             }
-
 
         }
 
@@ -72,51 +71,13 @@ class FetchVenuesIfNeededUseCaseTest {
             every { sharedRepository.getLastDataReceivedTimestamp() } returns 0
             every { location.isInZone(any(), any()) } returns false
             val getNearbyVenue = createGetNearbyVenueUseCase()
-            getNearbyVenue.fetchVenues(Tracker.Available(location), null)
-            coVerify(exactly = 0) {
-                readLocalFirstOrCallRemote.execute(any(), any())
-            }
-            coVerify(exactly = 1) {
-                callRemoteVenueAndNotifyUseCase.execute(any(), any())
-            }
-        }
-
-    @Test
-    fun `test when location is not changed and data is not expired then if call from ui(paginationinfo has value ) fetchVenueWithPagination should be called`() =
-        mainCoroutineRule.runBlockingTest {
-            val location = mockk<Location>()
-            every { sharedRepository.getLastLocation() } returns location
-            every { sharedRepository.getLastDataReceivedTimestamp() } returns System.currentTimeMillis()
-            every { location.isInZone(any(), any()) } returns false
-            val getNearbyVenue = createGetNearbyVenueUseCase()
-            getNearbyVenue.fetchVenues(Tracker.Available(location), PageInfo(0, 4, 3))
+            getNearbyVenue.fetchVenues(Tracker.Available(location))
 
             coVerify(exactly = 1) {
-                readLocalFirstOrCallRemote.execute(any(), any())
+                callRemote.execute(any(), any(), true)
+                dataValidityDataStore.setIsValidData(false)
             }
-            coVerify(exactly = 0) {
-                callRemoteVenueAndNotifyUseCase.execute(any(), any())
-            }
-
         }
 
-    @Test
-    fun `test when location is not change and data is not expired then if call from tracker changes(paginationinfo has not  value ) fetchVenueWithPagination shouldn't be called `() =
-        mainCoroutineRule.runBlockingTest {
-            val location = mockk<Location>()
-            every { sharedRepository.getLastLocation() } returns location
-            every { sharedRepository.getLastDataReceivedTimestamp() } returns System.currentTimeMillis()
-            every { location.isInZone(any(), any()) } returns false
-            val getNearbyVenue = createGetNearbyVenueUseCase()
-            getNearbyVenue.fetchVenues(Tracker.Available(location), null)
-
-            coVerify(exactly = 0) {
-                readLocalFirstOrCallRemote.execute(any(), any())
-            }
-            coVerify(exactly = 0) {
-                callRemoteVenueAndNotifyUseCase.execute(any(), any())
-            }
-
-        }
 
 }

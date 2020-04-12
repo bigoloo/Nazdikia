@@ -78,7 +78,7 @@ val koinModule = module {
 
     factory { FetchVenuesIfNeededUseCase(get(), get(), get()) }
     factory { CallRemoteAndSyncWithLocalUseCase(get(), get(), get()) }
-    factory { ReadLocalFirstOrCallRemoteUseCase(get(), get(), get(), get()) }
+    factory { ReadLocalFirstOrCallRemoteUseCase(get(), get(), get()) }
 
 
     single<Retrofit>(named("retrofit")) {
