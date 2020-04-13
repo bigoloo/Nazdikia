@@ -9,7 +9,8 @@ import com.bigoloo.interview.cafe.nazdikia.databinding.VenueLoadingItemViewBindi
 import com.bigoloo.interview.cafe.nazdikia.models.ListViewItem
 import com.bigoloo.interview.cafe.nazdikia.models.Venue
 
-class VenueAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class VenueAdapter(val context: Context, private val callback: (venue: Venue) -> Unit) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val itemDataType = 0
     private val loadingItemType = 1
     private val retryItem = 2
@@ -20,9 +21,9 @@ class VenueAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.Vie
 
         val inflater = LayoutInflater.from(context)
         return if (viewType == 0) {
-            VenueItemVIewHolder(VenueItemViewBinding.inflate(inflater))
+            VenueItemVIewHolder(VenueItemViewBinding.inflate(inflater, parent, false), callback)
         } else {
-            LoadingItemVIewHolder(VenueLoadingItemViewBinding.inflate(inflater))
+            LoadingItemVIewHolder(VenueLoadingItemViewBinding.inflate(inflater, parent, false))
         }
 
     }
@@ -48,9 +49,15 @@ class VenueAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.Vie
         this.venueList = venueList
     }
 
-    private class VenueItemVIewHolder(private val view: VenueItemViewBinding) :
+    private class VenueItemVIewHolder(
+        private val view: VenueItemViewBinding,
+        private val callback: (venue: Venue) -> Unit
+    ) :
         RecyclerView.ViewHolder(view.root) {
         fun bind(venue: Venue) {
+            view.root.setOnClickListener {
+                callback(venue)
+            }
             view.itemVenueTitle.text = venue.name
         }
     }

@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bigoloo.interview.cafe.nazdikia.R
 import com.bigoloo.interview.cafe.nazdikia.databinding.HomeScreenBinding
 import com.bigoloo.interview.cafe.nazdikia.models.*
@@ -23,13 +25,10 @@ class VenueScreen : Fragment() {
     private val venueViewModel: VenueViewModel by viewModel()
     private var binding: HomeScreenBinding? = null
     private fun view(): HomeScreenBinding = binding!!
-    private val adapter: VenueAdapter by lazy {
-        VenueAdapter(requireContext())
-    }
+    private lateinit var adapter: VenueAdapter
     private val endlessScrollListener = EndlessScrollListener(5) {
         venueViewModel.loadMore()
 
-        //addMoreLoadToRecyclerView()
     }
 
 
@@ -45,6 +44,11 @@ class VenueScreen : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        subscribeToViewModel()
+
+    }
+
+    private fun subscribeToViewModel() {
         venueViewModel.state.observe(viewLifecycleOwner, Observer { state ->
 
             when (state) {
@@ -80,6 +84,7 @@ class VenueScreen : Fragment() {
                         }
                         view().firstPageLoading.isVisible = true
                     } else {
+                        view().reloadVenue.isVisible = false
                         view().pageMessageError.isVisible = false
                         view().homeVenueList.isVisible = true
                         fillData(state.result.data)
@@ -95,7 +100,6 @@ class VenueScreen : Fragment() {
                 }
             }
         })
-
     }
 
     private fun showRetryButton() {
@@ -139,6 +143,10 @@ class VenueScreen : Fragment() {
     }
 
     private fun initView() {
+        adapter = VenueAdapter(requireContext()) {
+            findNavController().navigate(VenueScreenDirections.actionHomeScreenToDetailScreen())
+        }
+        view().homeVenueList.layoutManager = LinearLayoutManager(context)
 
         view().homeVenueList.adapter = adapter
         view().homeVenueList.addOnScrollListener(endlessScrollListener)
