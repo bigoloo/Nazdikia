@@ -16,13 +16,6 @@ class VenueViewModel(
 ) :
     BaseViewModel(coroutineDispatcherProvider) {
 
-    data class ViewState(
-        val pageInfo: PageInfo,
-        val venueList: List<Venue>,
-        val error: Throwable?,
-        val isLoadMoreNeeded: Boolean
-    )
-
     private val limit = 20
 
     init {
@@ -146,8 +139,6 @@ class VenueViewModel(
 
     fun loadMore() {
         fetchVenues(false)
-
-
     }
 
 }
