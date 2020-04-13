@@ -7,11 +7,9 @@ import org.koin.core.context.startKoin
 
 
 class NazdikiaApplication : Application() {
-
     override fun onCreate() {
         super.onCreate()
         initializeKoin()
-
     }
 
     private fun initializeKoin() {
