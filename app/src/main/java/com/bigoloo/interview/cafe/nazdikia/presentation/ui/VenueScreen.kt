@@ -17,11 +17,11 @@ import com.bigoloo.interview.cafe.nazdikia.presentation.ui.components.EndlessScr
 import com.bigoloo.interview.cafe.nazdikia.presentation.ui.components.VenueAdapter
 import com.bigoloo.interview.cafe.nazdikia.presentation.viewmodel.VenueViewModel
 import kotlinx.android.synthetic.main.home_screen.view.*
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class VenueScreen : Fragment() {
 
-    private val venueViewModel: VenueViewModel by viewModel()
+    private val venueViewModel: VenueViewModel by sharedViewModel()
     private var binding: HomeScreenBinding? = null
     private fun view(): HomeScreenBinding = binding!!
     private lateinit var adapter: VenueAdapter
@@ -143,6 +143,7 @@ class VenueScreen : Fragment() {
 
     private fun initView() {
         adapter = VenueAdapter(requireContext()) {
+            venueViewModel.selectedVenueItem(it)
             findNavController().navigate(VenueScreenDirections.actionHomeScreenToDetailScreen())
         }
         view().homeVenueList.layoutManager = LinearLayoutManager(context)

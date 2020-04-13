@@ -9,4 +9,7 @@
     <string name="error_location_is_off">سرویس لوکیشن شما خاموش است برای روشن کردن به تنظیمات گوشی بروید</string>
     <string name="error_unknown">خطای ناشناخته</string>
     <string name="retry">تلاش مجدد</string>
+    <string name="distance_near">فاصله تا شما : ‌%1d متر</string>
+    <string name="showInMap">نشان دادن در نقشه</string>
+    <string name="map_cant_open">خطا در باز کردن نقشه</string>
 </resources>

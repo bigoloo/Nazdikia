@@ -41,6 +41,7 @@ class VenueViewModel(
     val state = MutableLiveData<PaginatedLoadableData<Venue>>().apply {
         value = FirstPageNotLoaded
     }
+    val selectedItemsLiveData = MutableLiveData<Venue>()
 
     private fun fetchVenues(isForce: Boolean = false) = launch {
         var nextResultArgument: PageInfo? = null
@@ -136,6 +137,10 @@ class VenueViewModel(
             })
         }
 
+    }
+
+    fun selectedVenueItem(selectedVenue: Venue) {
+        selectedItemsLiveData.value = selectedVenue
     }
 
 

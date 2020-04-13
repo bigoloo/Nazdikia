@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bigoloo.interview.cafe.nazdikia.R
 import com.bigoloo.interview.cafe.nazdikia.databinding.VenueItemViewBinding
 import com.bigoloo.interview.cafe.nazdikia.databinding.VenueLoadingItemViewBinding
 import com.bigoloo.interview.cafe.nazdikia.models.ListViewItem
@@ -59,6 +60,12 @@ class VenueAdapter(val context: Context, private val callback: (venue: Venue) ->
                 callback(venue)
             }
             view.itemVenueTitle.text = venue.name
+            view.itemVenueDistance.text = view.itemVenueDistance.context.getString(
+                R.string.distance_near,
+                venue.location.distance
+            )
+
+
         }
     }
 
