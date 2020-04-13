@@ -34,7 +34,7 @@ class FusedLocationTrackerService(
         LocationServices.getFusedLocationProviderClient(context)
     private val locationRequest = LocationRequest().let {
         it.interval = 10_000
-        it.smallestDisplacement = 0f// TODO change it  for release
+        it.smallestDisplacement = 100f// TODO change it  for release
         it.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         it.setFastestInterval(10_000)
     }
