@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.HandlerThread
-import android.util.Log
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.InternetConnectivityDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationDataStore
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationPermissionStatusDataStore
@@ -43,25 +42,12 @@ class FusedLocationTrackerService(
     fun start() {
 
         scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
-        Log.e(
-            "LocationTrackerService",
-            "LocationTrackerService start"
-        )
-        Log.e(
-            "LocationTrackerService",
-            "internetConnectivityDataStore $internetConnectivityDataStore"
-        )
+
         scope.launch {
             internetConnectivityDataStore.isConnected()
                 .combine(locationPermissionStatusDataStore.getGrantedStatus()) { internetStatus, permissionStatus ->
-                    Log.e(
-                        "LocationTrackerService",
-                        "internet status internetStatus $internetStatus  permissionStatus $permissionStatus"
-                    )
                     internetStatus && permissionStatus
-
                 }.collect {
-                    Log.e("LocationTrackerService", "Connectivity $it")
                     if (it) {
                         locationTrackerJob?.cancel()
                         locationTrackerJob = startTrackingLocation()
@@ -79,7 +65,7 @@ class FusedLocationTrackerService(
     private suspend fun startTrackingLocation() = scope.launch {
 
         suspendCancellableCoroutine { continuation ->
-            Log.e("LocationTrackerService", "suspendCancellableCoroutine start")
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.checkSelfPermission(
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
@@ -95,7 +81,6 @@ class FusedLocationTrackerService(
                 override fun onLocationResult(result: LocationResult?) {
                     super.onLocationResult(result)
                     result?.locations?.forEach {
-                        Log.e("LocationTrackerService", " locations $it")
                         locationDataStore.setTracker(Tracker.Available(it.toLocation()))
                     }
 
@@ -106,15 +91,14 @@ class FusedLocationTrackerService(
 
 
             continuation.invokeOnCancellation {
-                Log.e("LocationTrackerService", "suspendCancellableCoroutine stop")
-                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             }
         }
 
     }
 
     fun stop() {
-        Log.e("LocationTrackerService", "FusedLocationTrackerService service stop")
         scope.cancel()
     }
 

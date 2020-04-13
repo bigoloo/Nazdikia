@@ -1,7 +1,6 @@
 package com.bigoloo.interview.cafe.nazdikia.presentation.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -137,7 +136,7 @@ class VenueScreen : Fragment() {
     }
 
     private fun fillData(data: List<Venue>) {
-        Log.e("fillData", "data size is ${data.size}")
+
         adapter.setVenueList(data.map { ListViewItem.Data(it) })
         adapter.notifyDataSetChanged()
     }

@@ -1,6 +1,5 @@
 package com.bigoloo.interview.cafe.nazdikia.domain.intractors
 
-import android.util.Log
 import com.bigoloo.interview.cafe.nazdikia.domain.datastore.LocationDataStore
 import com.bigoloo.interview.cafe.nazdikia.models.Tracker
 import kotlinx.coroutines.*
@@ -31,7 +30,6 @@ class SyncNearybyVenue(
 
 
     private suspend fun handleUpdateLocation(tracker: Tracker) {
-        Log.e("handleUpdateLocation", "called with $tracker")
         currentTracker = tracker
         when (tracker) {
             is Tracker.Available -> {
