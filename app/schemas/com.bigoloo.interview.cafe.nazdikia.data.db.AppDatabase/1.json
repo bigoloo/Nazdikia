@@ -1,0 +1,156 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "076c4287d55ed23e0aef5b61ada85029",
+    "entities": [
+      {
+        "tableName": "venue",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `location_address` TEXT, `location_cc` TEXT, `location_city` TEXT, `location_country` TEXT, `location_crossStreet` TEXT, `location_distance` INTEGER, `location_lat` REAL NOT NULL, `location_lng` REAL NOT NULL, `location_postalCode` TEXT, `location_state` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "location.address",
+            "columnName": "location_address",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.cc",
+            "columnName": "location_cc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.city",
+            "columnName": "location_city",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.country",
+            "columnName": "location_country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.crossStreet",
+            "columnName": "location_crossStreet",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.distance",
+            "columnName": "location_distance",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.lat",
+            "columnName": "location_lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "location.lng",
+            "columnName": "location_lng",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "location.postalCode",
+            "columnName": "location_postalCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location.state",
+            "columnName": "location_state",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "category",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`categoryId` TEXT NOT NULL, `name` TEXT NOT NULL, `pluralName` TEXT NOT NULL, `primary` INTEGER NOT NULL, `shortName` TEXT NOT NULL, `prefix` TEXT NOT NULL, `suffix` TEXT NOT NULL, PRIMARY KEY(`categoryId`))",
+        "fields": [
+          {
+            "fieldPath": "categoryId",
+            "columnName": "categoryId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pluralName",
+            "columnName": "pluralName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "primary",
+            "columnName": "primary",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortName",
+            "columnName": "shortName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "icon.prefix",
+            "columnName": "prefix",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "icon.suffix",
+            "columnName": "suffix",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "categoryId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '076c4287d55ed23e0aef5b61ada85029')"
+    ]
+  }
+}
